@@ -8,9 +8,18 @@ namespace ServerAllocator
         public static List<int> BatchPerformanceNumbers = new() { 20, 21, 22, 23, 24 };
         public static List<int> BatchCalculationNumbers = new() { 30, 31, 32, 33, 34 };
         public static List<int> BatchProcessingNumbers = new() { 40, 41, 42, 43, 44 };
+
+        /// <summary>
+        /// Based on the servertype, pick the lowest available servernumber from the corresponding list.
+        /// Add the number to the servertype, and return the result
+        /// </summary>
+        /// <param name="serverType"></param>
+        /// <returns>A serverName consisting of servertype and server number</returns>
         public static string Allocate(string serverType)
         {
             var allocateResult = "";
+
+            //Sort the numbers in ascending order so that everytime we allocate, we can pick the first number as the lowest available.
             BatchPerformanceNumbers.Sort();
             BatchCalculationNumbers.Sort();
             BatchProcessingNumbers.Sort();
@@ -47,14 +56,18 @@ namespace ServerAllocator
                     else
                         allocateResult = "There are no available server numbers";
                     break;
-                    //Remove this number from the array.
             }
             return allocateResult;
         }
 
+        /// <summary>
+        /// Takes a servername, splits the servernumber and puts it back in the correct list.
+        /// </summary>
+        /// <param name="serverName"></param>
+        /// <returns>A message explaining the result of the operation</returns>
         public static string DeAllocate(string serverName)
         {
-            var values = SplitString(serverName);
+            var values = SplitServerNumberFromServerType(serverName);
             var deallocateResult = "";
 
             switch (values.name)
@@ -90,7 +103,12 @@ namespace ServerAllocator
             return deallocateResult;
         }
 
-        private static (string name, string number) SplitString(string serverName)
+        /// <summary>
+        /// Split the server number from the servertype
+        /// </summary>
+        /// <param name="serverName"></param>
+        /// <returns>A Tuple with the server number and servertype</returns>
+        private static (string name, string number) SplitServerNumberFromServerType(string serverName)
         {
             var numAlpha = new Regex("(?<Alpha>[a-zA-Z]*)(?<Numeric>[0-9]*)");
             var match = numAlpha.Match(serverName);
@@ -101,7 +119,7 @@ namespace ServerAllocator
             return (alpha, num);
         }
 
-
+        //Obsolete!
         private static int[] RemoveItem(int[] array, int number)
         {
             int index = Array.IndexOf(array, number);
